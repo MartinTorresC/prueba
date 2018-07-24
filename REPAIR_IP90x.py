@@ -67,12 +67,14 @@ class principal(QtGui.QMainWindow, form_class):
         #print self.Informacion_DB_RTDS
         #self.actionRe_Imprimir_Etiqueta.triggered.connect(self.Reimprimir_Etiqueta)
         '''
+
         self.actionEjecutar_Prueba_Funcional.triggered.connect(self.conexion_telnet)
         self.actionEjecutar_Prueba_de_Bluetooth.triggered.connect(self.Verificacion_Bluetooth)
         self.actionEjecutar_Prueba_de_Video.triggered.connect(self.Verificacion_Audio_Video)
         self.actionEjecutar_Prueba_de_MoCA_1150MHz.triggered.connect(self.Verificacion_MOCA1150)
         self.actionEjecutar_Prueba_de_MoCA_1600_MHz.triggered.connect(self.Verificacion_MOCA1600)
-        '''  
+        ''' 
+        print "Verificando el git" 
         return
     
     def Inicializar (self):
