@@ -5,6 +5,9 @@ Created on Mar 14, 2018
 '''
 import telnetlib
 import socket
+#import os
+#import shutil
+#import ConfigParser
 import sys
 import time
 import datetime
@@ -69,26 +72,6 @@ class principal(QtGui.QMainWindow, form_class):
         self.actionRe_Imprimir_Etiqueta.triggered.connect(self.Reimprimir_Etiqueta)
         #self.actionEjecutar_Prueba_Funcional.triggered.connect(self.conexion_telnet) 
         return
-    def clear_data(self):
-        
-        print "ENTRO A LIMPIAR DATOS"
-        
-        for key in self.datos.guardarDatos.iterkeys():
-            print "ENTRO AL FOR"
-            print key
-            if key =='Station':
-                print 'Estoy en la estacion'
-                pass
-            elif key =='Test_Station':
-                print 'estoy en la Test Station'
-                pass
-            elif key == 'Model':
-                pass
-            else:
-                self.datos.guardarDatos[key] ='X'
-        print self.datos.guardarDatos         
-        return
-        
     def read_config(self, section):
         filename = "config_ip90.conf"
         Config = ConfigParser.ConfigParser()
@@ -116,7 +99,7 @@ class principal(QtGui.QMainWindow, form_class):
             
         return dict1    
     def Inicializar (self):
-        print "INICIALIZANDO GRAFICO"
+        
         self.lblShowMSG.setStyleSheet("background-color: cyan")
         self.lblscan.setStyleSheet('background-color:None')
         self.lblShow.clear()
@@ -150,18 +133,37 @@ class principal(QtGui.QMainWindow, form_class):
         self.tblResultado.item(4,1).setBackground(QtGui.QColor(255,255,255))            
         #self.Informacion_DB.clear()
         #print self.Informacion_DB
-        #self.clear_data()
+        return
+    def clear_data(self):
+        print "EJECUTANDO RUTINA PARA LIMPIAR DATOS DE LA UNIDAD ANTERIOR"
+        
+        for key in self.datos.guardarDatos.iterkeys():
+            print "LIMPIANDO DATOS DE LA UNIDAD ANTERIOR"
+            print key
+            if key == 'Station':
+                print'Estoy en la estacion'
+                pass
+            elif key == 'Test_Station':
+                print'Estoy en la Test estacion'
+                pass
+            
+            elif key == 'Model':
+                pass  
+            else:
+                self.datos.guardarDatos[key]='X'
+        print self.datos.guardarDatos
         return
     
     def iniciar(self):
         
         self.Inicializar()
+        self.clear_data()
                         
         if self.btnStart.text() == 'I N I C I A R':
             self.btnStart.setText('C A N C E L A R')
             msg = 'INICIANDO PRUEBA...'
             self.lblShowMSG.setText(msg)
-            self.clear_data()
+            #self.clear_data()
             self.Informacion_DB = self.datos.guardarDatos
             print self.Informacion_DB
             print self.Informacion_DB_RTDS
@@ -288,7 +290,7 @@ class principal(QtGui.QMainWindow, form_class):
                     self.Informacion_DB['Failure_Code']= retResult ["Error_Code"]
                     self.Informacion_DB['Failure_Description']= retResult ["Error_Description"]
                     self.Informacion_DB['Result'] = retResult ["Result"]
-                    #retVal = self._process_guardar_datos(self.Informacion_DB)
+                    retVal = self._process_guardar_datos(self.Informacion_DB)
                     return
                 
                 print retResult
@@ -732,7 +734,6 @@ class principal(QtGui.QMainWindow, form_class):
             jmsg = {}
             
             try:
-                
                 if modelo.startswith("IP901"):
                     print "CREANDO ARCHIVO DE ETIQUETA PARA MODELO: " + modelo
                     f = open('ip90x_label.txt', 'w')
@@ -740,28 +741,32 @@ class principal(QtGui.QMainWindow, form_class):
                     inicioCampo = "^FD"
                     terminacionLinea = "\n"
                     comandoInicial = '^XA' + terminacionLinea
-                    labelHome = "50,400"
+                    labelHome = "07,20"
                     configurarHome = '^LH' + labelHome + terminacionCampo + terminacionLinea
-                    fontSize = "40,30"
-                    fontName = "E:AVE000.FNT"
+                    fontSize = "25,25"
+                    fontName = "E:AVENIRLL.FNT"
                     f.write(comandoInicial)
                     f.write(configurarHome)
                     
-                    f.write("^FO0,100^A@N," + fontSize + "," + fontName + inicioCampo + "TSN: " + infoImprimir["TSN"] + terminacionCampo + terminacionLinea)
-                    f.write("^FO0,125^GB450,0,34"+ terminacionCampo + terminacionLinea)
-                    f.write("^FR^FO25,125^BY2,1.48^BCN,34,N,N,N" + inicioCampo + infoImprimir["TSN"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO130,60^A@N,28,25,E:AVENIRLL.FNT^FDMODEL: TCDA95000^FS" + terminacionLinea)
                     
-                    f.write("^FO0,180^A@N," + fontSize + "," + fontName + inicioCampo + "MAC1: " + infoImprimir["MAC1"] + terminacionCampo + terminacionLinea)
-                    f.write("^FO0,205^GB381,0,34" + terminacionCampo + terminacionLinea)
-                    f.write("^FR^FO25,205^BY2,1.48^BCN,34,N,N,N" + inicioCampo + infoImprimir["MAC1"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,90^A@N," + fontSize + "," + fontName + inicioCampo + "TSN: " + infoImprimir["TSN"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,115^GB450,0,30"+ terminacionCampo + terminacionLinea)
+                    f.write("^FR^FO25,115^BY2,1.48^BCN,30,N,N,N" + inicioCampo + infoImprimir["TSN"] + terminacionCampo + terminacionLinea)
                     
-                    f.write("^FO0,260^A@N," + fontSize + "," + fontName + inicioCampo + "MAC2: " + infoImprimir["MAC2"] + terminacionCampo + terminacionLinea)
-                    f.write("^FO0,285^GB381,0,34" + terminacionCampo + terminacionLinea)
-                    f.write("^FR^FO25,285^BY2,1.48^BCN,34,N,N,N" + inicioCampo + infoImprimir["MAC2"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,155^A@N," + fontSize + "," + fontName + inicioCampo + "MAC1: " + infoImprimir["MAC1"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,179^GB381,0,30" + terminacionCampo + terminacionLinea)
+                    f.write("^FR^FO25,179^BY2,1.48^BCN,30,N,N,N" + inicioCampo + infoImprimir["MAC1"] + terminacionCampo + terminacionLinea)
                     
-                    f.write("^FO0,340^A@N," + fontSize + "," + fontName + inicioCampo + "SKU: " + infoImprimir["SKU"] + terminacionCampo + terminacionLinea)
-                    f.write("^FO0,365^GB271,0,34"  + terminacionCampo + terminacionLinea)
-                    f.write("^FR^FO25,365^BY2,1.48^BCN,34,N,N,N" + inicioCampo + infoImprimir["SKU"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,220^A@N," + fontSize + "," + fontName + inicioCampo + "MAC2: " + infoImprimir["MAC2"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,244^GB381,0,30" + terminacionCampo + terminacionLinea)
+                    f.write("^FR^FO25,244^BY2,1.48^BCN,30,N,N,N" + inicioCampo + infoImprimir["MAC2"] + terminacionCampo + terminacionLinea)
+                    
+                    f.write("^FO0,285^A@N," + fontSize + "," + fontName + inicioCampo + "SKU:" + infoImprimir["SKU"] + terminacionCampo + terminacionLinea)
+                    f.write("^FO0,309^GB271,0,30"  + terminacionCampo + terminacionLinea)
+                    f.write("^FR^FO25,309^BY2,1.48^BCN,30,N,N,N" + inicioCampo + infoImprimir["SKU"] + terminacionCampo + terminacionLinea)
+                    
+                    f.write("^FO403,315^A@N,25,25,E:AVENIRLL.FNT^FD" + self.fecha_hora_actual()['formato6'] + terminacionCampo + terminacionLinea)
                     
                     f.write('^PQ1,0,0,N\n')
                     f.write('^XZ\n')
@@ -769,12 +774,15 @@ class principal(QtGui.QMainWindow, form_class):
                     #f.write('ARCHIVO CREADO EXITOSAMENTE, SOLO FALTA EL CODIGO PARA LA ETIQUETA!!!!!')
                     f.close()
                     jmsg = msg_para_json('P')
-                    #return (jmsg) 
+                    #return (jmsg)
+                    
+                    
             except Exception, e:
                 jmsg = msg_para_json('F', 'ERR0055', "ERROR EN LA RUTINA CREAR ARCHIVO " + str(e))
                 #return (jmsg)
-    
-            return (jmsg)     
+            
+            return (jmsg)
+     
     def imprimirIP(self,modelo, opciones=None):
         jmsg = {}
         '''
@@ -919,6 +927,7 @@ class principal(QtGui.QMainWindow, form_class):
             jmsg = msg_para_json('F', 'ERR0060', str(e))
             return (jmsg)                   
     def Falla (self,msg):
+
         
         self.lblShowMSG.setText(msg)
         self.guardar_logs(msg)
@@ -927,6 +936,42 @@ class principal(QtGui.QMainWindow, form_class):
         self.lblShowMSG.setStyleSheet("background-color: orange")
         
         return
+    def fecha_hora_actual(self,f=None, h=None):
+        result = {}
+        #localtime = time.asctime( time.localtime(time.time()) )
+        if f is None:
+            hoy = datetime.date.today()
+        else:
+            hoy = f
+        #print "esta es la hora proporcionada", h
+        #print "'" + str(hoy) + "'"
+        
+        horaactual =  time.strftime("%H%M%S",time.localtime(time.time()))
+        #fechaactual = str(datetime.datetime.now().date()) + " "
+        horaActual = time.strftime("%H:%M:%S",time.localtime(time.time()))
+        #print horaActual
+        fechaActual = hoy.strftime("%b %d %Y")
+        #print fechaActual 
+        ahoy = hoy.strftime("%m%d%Y")
+        result['formato1'] = ahoy + horaactual
+        #print result['formato1']
+        result['formato2'] = fechaActual #+ " " + horaActual  
+        #print result['formato2']
+        result['formato3'] = datetime.date.today().strftime("%Y-%m-%d")
+        
+        # Cambio de formato de fecha hora para High-Jump
+        horaActual = time.strftime("%H%M",time.localtime(time.time()))
+        ahora = hoy.strftime("%Y%m%d")
+        
+        result['formato4'] = ahora + horaActual
+        
+        if h is not None:
+            #print ahora + h.strftime("%H%M")
+            result['formato5'] = ahora + h.strftime("%H%M")
+        
+        result['formato6'] = hoy.strftime("%d-%b-%y").upper()
+        
+        return (result)
     
     def PruebaCancelada (self):
         
