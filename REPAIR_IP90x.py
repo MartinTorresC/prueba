@@ -124,6 +124,7 @@ class principal(QtGui.QMainWindow, form_class):
      
         self.comboBox.currentIndex()
         self.comboBox.currentText()
+        
         print self.comboBox.currentText()
         self.Informacion_DB['Model'] = self.comboBox.currentText()
         
